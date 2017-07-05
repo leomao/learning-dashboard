@@ -17,5 +17,17 @@ const handler = (err, stats) => {
   }
 };
 
-clientCompiler.run(handler);
-serverCompiler.run(handler);
+let serverflag = true;
+let clientflag = true;
+if (process.argv.length > 2) {
+  if (process.argv[2] == '--server')
+    clientflag = false;
+  else if (process.argv[2] == '--client')
+    serverflag = false;
+}
+
+if (clientflag)
+  clientCompiler.run(handler);
+
+if (serverflag)
+  serverCompiler.run(handler);

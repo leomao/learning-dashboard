@@ -1,0 +1,51 @@
+#outer {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+#sidebar {
+  grid-column: 1;
+}
+
+#panel {
+  grid-column: 2 / 13;
+}
+
+#sidebar .active {
+  background-color: rgba(100, 100, 255, 0.4);
+}
+
+#panel .draghandle {
+  background-color: rgba(50, 50, 50, 0.5);
+  margin-bottom: 5px;
+}
+
+#panel .pane {
+  position: relative;
+  height: calc(100% - 30px);
+  width: 100%;
+}
+
+#panel .image > img {
+  image-rendering: pixelated;
+  display: block;
+  object-fit: contain;
+  height: 100%;
+  width: 100%;
+  user-select: none;
+}
+
+#panel .plot > .plot-container {
+  overflow: hidden;
+  height: calc(100% - 25px);
+  width: 100%;
+}
+
+#panel .episode {
+  display: flex;
+  flex-direction: column;
+}
+
+canvas.canvid {
+  width: 100%;
+}

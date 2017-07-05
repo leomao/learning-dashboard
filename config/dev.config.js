@@ -15,25 +15,30 @@ clientConfig.plugins.push(
   new webpack.NamedModulesPlugin(),
   // do not emit compiled assets that include errors
   new webpack.NoEmitOnErrorsPlugin(),
+  new webpack.DefinePlugin({
+    'process.env.NODE_ENV': JSON.stringify('development'),
+  }),
 );
 
 clientConfig.devServer = {
   host: 'localhost',
-  port: 3001,
+  port: 20333,
   // respond to 404s with index.html
   historyApiFallback: true,
   // enable HMR on the server
   hot: true,
   proxy: {
-    '/api': 'http://localhost:3000',
-    '/clientws': 'http://localhost:3000',
+    '/clientws': {
+      target: 'ws://localhost:3000',
+      ws: true,
+    },
   },
   stats: {
     children: false,
     chunks: false,
     colors: true,
     modules: false,
-  }
+  },
 };
 
 serverConfig.devtool = 'inline-source-map';

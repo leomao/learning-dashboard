@@ -8,7 +8,7 @@ const clientCompiler = Webpack(clientConfig);
 const devConfig = clientConfig.devServer;
 const devserver = new WebpackDevServer(clientCompiler, devConfig);
 
-devserver.listen(devConfig.port, () => {
+devserver.listen(devConfig.port, '0.0.0.0', () => {
   console.log(`frontend server listening on http://localhost:${devConfig.port}`);
 });
 

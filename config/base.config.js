@@ -2,11 +2,20 @@ const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const rootPath = path.resolve(__dirname, '../');
 
+const babelPlugins = [
+  [ 'transform-object-rest-spread', { 'useBuiltIns': true }],
+  [ 'transform-class-properties', { 'spec': true }],
+];
+
 const serverConfig = {
   target: 'node',
+  node: {
+    __dirname: false,
+  },
   externals: [nodeExternals()],
   entry: path.join(rootPath, 'src/server/server.js'),
 
@@ -26,7 +35,8 @@ const serverConfig = {
               presets: [
                 ['env', { 'targets': { 'node': true } }],
                 'react',
-              ]
+              ],
+              plugins: babelPlugins,
             }
           }
         ],
@@ -35,7 +45,6 @@ const serverConfig = {
     ],
   },
 };
-
 
 const clientConfig = {
   entry: [
@@ -65,7 +74,8 @@ const clientConfig = {
               presets: [
                 ['env', { 'targets': { 'chrome': 58 } }],
                 'react',
-              ]
+              ],
+              plugins: babelPlugins,
             }
           }
         ],
@@ -79,10 +89,8 @@ const clientConfig = {
           {
             loader: 'postcss-loader',
             options: {
-              parser: 'sugarss',
-              plugins: {
-                'postcss-import': {},
-                'cssnano': {},
+              config: {
+                path: path.join(rootPath, 'config/postcss.config.js'),
               },
             }
           }
