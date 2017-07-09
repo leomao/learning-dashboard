@@ -22,7 +22,7 @@ class PlotPane extends React.Component {
       labels: ['X', 'Y'],
       labelsDiv: this.labelsDiv,
       showRoller: true,
-      rollPeriod: 10,
+      rollPeriod: 1,
       errorBars: this.props.statStyle == 'STD',
       customBars: this.props.statStyle == 'LMH',
     };

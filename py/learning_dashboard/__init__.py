@@ -32,7 +32,7 @@ class DashboardClient:
             'scalar': scalar,
             'step': step,
         }
-        self._send_request('/add_scalar', data)
+        return self._send_request('/add_scalar', data)
 
     def add_stats(self, name, value, std, step):
         data = {
@@ -42,7 +42,7 @@ class DashboardClient:
             'std': std,
             'step': step,
         }
-        self._send_request('/add_stats', data)
+        return self._send_request('/add_stats', data)
 
     def add_image(self, name, img, step):
         '''
@@ -52,7 +52,7 @@ class DashboardClient:
         '''
         
         img = convert_image(img)
-        buf = imageio.imwrite(imageio.RETURN_BYTES, image, format='PNG')
+        buf = imageio.imwrite(imageio.RETURN_BYTES, img, format='PNG')
         s = b64encode(buf).decode()
         data = {
             'run_name': self._run_name,
@@ -60,7 +60,7 @@ class DashboardClient:
             'image': s,
             'step': step,
         }
-        self._send_request('/add_image', data)
+        return self._send_request('/add_image', data)
 
     def add_episode(self, name, episode):
         frames = [convert_image(img) for img in episode]
@@ -90,7 +90,7 @@ class DashboardClient:
             'width': width,
             'height': height,
         }
-        self._send_request('/add_episode', data)
+        return self._send_request('/add_episode', data)
 
 __all__ = [
     'DashboardClient',

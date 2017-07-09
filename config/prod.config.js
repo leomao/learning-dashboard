@@ -5,6 +5,8 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const [serverConfig, clientConfig] = require('./base.config.js');
 
+const rootPath = path.resolve(__dirname, '../');
+
 clientConfig.devtool = 'source-map';
 
 // update loaders for css
