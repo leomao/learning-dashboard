@@ -34,8 +34,8 @@ const handler = (io) => {
     updateRuns: (runNames) => {
       io.emit('/runs', runNames);
     },
-    broadcast: (runName, action, data) => {
-      io.to(runName).emit('action', action, runName, data);
+    broadcast: (runName, path, data) => {
+      io.to(runName).emit('/server/update', runName, path, data);
     },
   });
 };

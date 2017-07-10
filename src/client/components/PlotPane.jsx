@@ -19,7 +19,7 @@ class PlotPane extends React.Component {
   createGraph(data) {
     const opts = {
       legend: 'always',
-      labels: ['X', 'Y'],
+      labels: ['step', 'value'],
       labelsDiv: this.labelsDiv,
       showRoller: true,
       rollPeriod: 1,
@@ -39,16 +39,16 @@ class PlotPane extends React.Component {
   }
 
   transformData() {
-    let { x, y } = this.props.data;
+    let { step, value } = this.props.data;
     // immutablejs
-    y = y.toJS();
-    let data = x.zip(y).toArray();
+    value = value.toJS();
+    let data = step.zip(value).toArray();
     return data;
   }
 
   updateSize() {
     // a dirty hack to wait the div resized
-    setTimeout(() => this.graph.resize(), 100);
+    setTimeout(() => this.graph.resize(), 200);
   }
 
   render() {

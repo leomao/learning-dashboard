@@ -30,7 +30,7 @@ class Grid extends React.Component {
       out.push({
         i: path,
         x: Math.floor(cnt / 4) * 2,
-        y: (cnt % 4) * 2,
+        y: Infinity,
         w: 2,
         h: 2,
       });
@@ -39,26 +39,44 @@ class Grid extends React.Component {
     return out;
   }
 
+  updateLayout(current, map) {
+    if (!this._layouts.has(current)) {
+      this._layouts.set(current, []);
+    }
+    let layout = this._layouts.get(current);
+    let contained = new Set();
+    for (let item of layout) {
+      contained.add(item.i);
+    }
+    let cnt = 0;
+    for (let [path, data] of map.entries()) {
+      if (!contained.has(path)) {
+        layout.push({
+          i: path,
+          x: Math.floor(cnt / 3) * 2,
+          y: Infinity,
+          w: 1,
+          h: 3,
+        });
+        cnt += 1;
+      }
+    }
+  }
+
   generateDOM(map) {
     this._panes.clear();
     let out = [];
     for (let [path, data] of map.entries()) {
       // immutablejs
       data = data.toObject();
-      if (data.type == 'SCALAR_PLOT') {
+      if (data.type == 'SCALAR' || data.type == 'STATS') {
+        let statStyle = '';
+        if (data.type == 'STATS')
+          statStyle = 'STD';
         out.push(
           <div key={path}>
             <div className='draghandle'>{path}</div>
-            <PlotPane path={path} data={data}
-              ref={(node) => { this._panes.set(path, node); }}/>
-          </div>
-        );
-      }
-      else if (data.type == 'STATS_PLOT') {
-        out.push(
-          <div key={path}>
-            <div className='draghandle'>{path}</div>
-            <PlotPane path={path} data={data} statStyle={'STD'}
+            <PlotPane path={path} data={data} statStyle={statStyle}
               ref={(node) => { this._panes.set(path, node); }}/>
           </div>
         );
@@ -100,13 +118,11 @@ class Grid extends React.Component {
 
   render() {
     let { current, map } = this.props;
-    if (!this._layouts.has(current)) {
-      this._layouts.set(current, this.generateLayout(map));
-    }
+    this.updateLayout(current, map);
     let layout = this._layouts.get(current);
     return (
       <ReactGridLayout
-        layout={layout} cols={12} rowHeight={80} width={1200}
+        layout={layout} cols={4} rowHeight={48} width={1000}
         autoSize={false}
         draggableHandle={'.draghandle'}
         onLayoutChange={this.onLayoutChange}

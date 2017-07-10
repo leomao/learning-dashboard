@@ -3,10 +3,11 @@ import io from 'socket.io-client';
 const socket = io.connect({ path : '/clientws' });
 
 export default function handle(store) {
-  socket.on('action', (action, runName, data) => {
+  socket.on('/server/update', (runName, path, data) => {
     store.dispatch({
-      type: action,
+      type: 'UPDATE_PATH',
       runName,
+      path,
       data,
     });
   });

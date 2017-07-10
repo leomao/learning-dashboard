@@ -5,31 +5,35 @@ const initialState = Imm.Map({
   data: Imm.Map(),
 });
 
-const defaultScalar = Imm.Map({
-  type: 'SCALAR_PLOT',
-  x: Imm.List(),
-  y: Imm.List(),
-});
+const defaultVals = {
+  'SCALAR': Imm.Map({ type: 'SCALAR', step: Imm.List(), value: Imm.List(), }),
+  'STATS': Imm.Map({ type: 'STATS', step: Imm.List(), value: Imm.List(), }),
+}
 
-const defaultStats = Imm.Map({
-  type: 'STATS_PLOT',
-  x: Imm.List(),
-  y: Imm.List(),
-});
-
-const defaultImage = Imm.Map({
-  type: 'IMAGE',
-  image: '',
-  step: 0,
-});
-
-const defaultEpisode = Imm.Map({
-  type: 'EPISODE',
-  episode: '',
-  steps: 0,
-  width: 0,
-  hieght: 0,
-});
+const updatePath = (state, action) => {
+  let { runName, path, data } = action;
+  switch (data.type) {
+    case 'SCALAR':
+    case 'STATS':
+      return state.updateIn(
+        ['data', runName, path],
+        (s) => {
+          if (!s || s.get('type') != data.type) {
+            s = defaultVals[data.type];
+          }
+          return s.withMutations(ts => {
+            ts.update('step', arr => arr.push(data.step))
+              .update('value', arr => arr.push(Imm.fromJS(data.value)));
+          });
+        }
+      );
+    case 'IMAGE':
+    case 'EPISODE':
+      return state.setIn(['data', runNAme, path], data);
+    default:
+      return state;
+  }
+};
 
 export default function runs(state = initialState, action) {
   switch (action.type) {
@@ -37,51 +41,8 @@ export default function runs(state = initialState, action) {
       return state.set('names', Imm.List(action.names));
     case 'GET_RUN':
       return state.setIn(['data', action.runName], Imm.fromJS(action.data));
-    case 'ADD_SCALAR':
-      return state.updateIn(
-        ['data', action.runName, action.data.path],
-        (s = defaultScalar) => {
-          return s.withMutations(ts => {
-            ts.update('x', arr => arr.push(action.data.step))
-              .update('y', arr => arr.push(action.data.scalar));
-          });
-        }
-      );
-    case 'ADD_STATS':
-      return state.updateIn(
-        ['data', action.runName, action.data.path],
-        (s = defaultStats) => {
-          return s.withMutations(ts => {
-            ts.update('x', arr => arr.push(action.data.step))
-              .update(
-                'y',
-                arr => arr.push(Imm.List.of(action.data.value,
-                                            action.data.std))
-              );
-          });
-        }
-      );
-    case 'ADD_IMAGE':
-      return state.updateIn(
-        ['data', action.runName, action.data.path],
-        (s = defaultImage) => {
-          return s.withMutations(ts => {
-            ts.set('image', action.data.image).set('step', action.data.step);
-          });
-        }
-      );
-    case 'ADD_EPISODE':
-      return state.updateIn(
-        ['data', action.runName, action.data.path],
-        (s = defaultEpisode) => {
-          return s.withMutations(ts => {
-            ts.set('episode', action.data.episode)
-              .set('steps', action.data.steps)
-              .set('width', action.data.width)
-              .set('height', action.data.height);
-          });
-        }
-      );
+    case 'UPDATE_PATH':
+      return updatePath(state, action);
     default:
       return state;
   }

@@ -2,43 +2,31 @@ import logger from './logger';
 
 const actions = new Map();
 
-actions.set('ADD_SCALAR', (m, data) => {
-  let {path, ...d} = data;
-  if (!m.has(path)) {
-    m.set(path, { type: 'SCALAR_PLOT', x: [], y: [] });
+const appendAction = (m, path, data) => {
+  let {type, ...d} = data;
+  let obj = m.get(path);
+  if (!obj || obj.type != type) {
+    obj = { type: type };
+    for (let k of Object.keys(d)) {
+      obj[k] = [ data[k] ];
+    }
+    m.set(path, obj);
   }
-  m.get(path).x.push(d.step);
-  m.get(path).y.push(d.scalar);
-});
+  else {
+    for (let k of Object.keys(d)) {
+      obj[k].push(data[k]);
+    }
+  }
+}
 
-actions.set('ADD_STATS', (m, data) => {
-  let {path, ...d} = data;
-  if (!m.has(path)) {
-    m.set(path, { type: 'STATS_PLOT', x: [], y: [] });
-  }
-  m.get(path).x.push(d.step);
-  m.get(path).y.push([d.value, d.std]);
-});
+const updateAction = (m, path, data) => {
+  m.set(path, data);
+}
 
-actions.set('ADD_IMAGE', (m, data) => {
-  let {path, ...d} = data;
-  if (!m.has(path)) {
-    m.set(path, { type: 'IMAGE', image: '', step: 0, });
-  }
-  m.get(path).image = d.image;
-  m.get(path).step = d.step;
-});
-
-actions.set('ADD_EPISODE', (m, data) => {
-  let {path, ...d} = data;
-  if (!m.has(path)) {
-    m.set(path, { type: 'EPISODE', episode: '', steps: 0, width:0, height: 0 });
-  }
-  m.get(path).episode = d.episode;
-  m.get(path).steps = d.steps;
-  m.get(path).width = d.width;
-  m.get(path).height = d.height;
-});
+actions.set('SCALAR', appendAction);
+actions.set('STATS', appendAction);
+actions.set('IMAGE', updateAction);
+actions.set('EPISODE', updateAction);
 
 class Store {
   constructor() {
@@ -69,14 +57,13 @@ class Store {
     return this.runs.get(runName);
   }
 
-  addEvent(runName, action, data) {
+  addEvent(runName, path, data) {
     const m = this.get(runName);
-    if (actions.has(action)) {
-      actions.get(action)(m, data);
+    if (actions.has(data.type)) {
+      actions.get(data.type)(m, path, data);
+      if (this._broadcast)
+        this._broadcast(runName, path, data);
     }
-
-    if (this._broadcast)
-      this._broadcast(runName, action, data);
   }
 
 }
