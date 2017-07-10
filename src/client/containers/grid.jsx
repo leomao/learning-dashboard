@@ -13,6 +13,8 @@ const resizing = (...args) => {
   console.log(args);
 }
 
+const STORAGE_KEY = 'all_layouts';
+
 class Grid extends React.Component {
   static propTypes = {
   };
@@ -20,7 +22,12 @@ class Grid extends React.Component {
   constructor(props) {
     super(props);
     this._panes = new Map();
-    this._layouts = new Map();
+    let savedLayout = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    this._layouts = new Map(savedLayout);
+  }
+
+  saveLayout() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...this._layouts]));
   }
 
   generateLayout(map) {
@@ -40,6 +47,9 @@ class Grid extends React.Component {
   }
 
   updateLayout(current, map) {
+    // do not need to generate layout if there is nothing to display
+    if (map.size == 0)
+      return;
     if (!this._layouts.has(current)) {
       this._layouts.set(current, []);
     }
@@ -61,6 +71,7 @@ class Grid extends React.Component {
         cnt += 1;
       }
     }
+    this.saveLayout();
   }
 
   generateDOM(map) {
@@ -108,6 +119,7 @@ class Grid extends React.Component {
 
   onLayoutChange = (layout) => {
     this._layouts.set(this.props.current, layout);
+    this.saveLayout();
   }
 
   onResizeStop = (layout, olditem, item) => {

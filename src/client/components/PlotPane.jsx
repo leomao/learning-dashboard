@@ -14,6 +14,7 @@ class PlotPane extends React.Component {
         this.graph.updateOptions({ 'file': data });
     else
       this.createGraph(data);
+    this.updateSize();
   }
 
   createGraph(data) {
@@ -25,8 +26,12 @@ class PlotPane extends React.Component {
       rollPeriod: 1,
       errorBars: this.props.statStyle == 'STD',
       customBars: this.props.statStyle == 'LMH',
+      axes: {
+        y: { axisLabelWidth: 20 },
+      }
     };
     
+    this.graph = new Dygraph(this.plot, data, opts);
     //if (opts.errorBars) {
       //opts.valueFormatter = (data) => {
         //console.log(data);
@@ -34,8 +39,6 @@ class PlotPane extends React.Component {
         //return 
       //}
     //}
-
-    this.graph = new Dygraph(this.plot, data, opts);
   }
 
   transformData() {

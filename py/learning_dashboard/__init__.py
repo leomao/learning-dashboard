@@ -9,8 +9,7 @@ def convert_image(img):
         img = img.repeat(3, axis=1).reshape((*img.shape, 3))
 
     if np.issubdtype(img.dtype, float):
-        if img.max() <= 1:
-            img = img * 255.
+        img = np.clip(img * 255., 0, 255)
         img = np.uint8(img)
 
     return img
@@ -38,8 +37,7 @@ class DashboardClient:
         data = {
             'run_name': self._run_name,
             'path': name,
-            'value': value,
-            'std': std,
+            'stats': [value, std],
             'step': step,
         }
         return self._send_request('/add_stats', data)

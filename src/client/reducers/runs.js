@@ -29,7 +29,7 @@ const updatePath = (state, action) => {
       );
     case 'IMAGE':
     case 'EPISODE':
-      return state.setIn(['data', runNAme, path], data);
+      return state.setIn(['data', runName, path], Imm.fromJS(data));
     default:
       return state;
   }
